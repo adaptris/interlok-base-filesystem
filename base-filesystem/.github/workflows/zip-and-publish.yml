@@ -1,0 +1,62 @@
+name: Zip And Publish
+
+on:
+  create:
+    tags:
+      - '**'
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: 'Release Version'
+        type: string
+        required: true
+        
+env:
+  RELEASE_VERSION: ${{ github.event.inputs.release-version }}
+        
+jobs:
+  zip-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Git Config
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+      - name: Create Tag
+        run: |
+          git tag -a ${{ github.event.inputs.release-version }} -m "Add tag ${{ github.event.inputs.release-version }}"
+          git push origin --tags
+      - name: Checkout Templates
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: adaptris/interlok-templates
+          path: interlok-templates
+      - name: Zip interlok-base-filesystem
+        run: |
+          cd ./base-filesystem && zip -r interlok-base-filesystem.zip . -x *.zip
+      - name: Copy Templates
+        # Copy the templates to the base-filesystem-with-templates dir but ignoring git files
+        run: |
+          mkdir -p ./base-filesystem/ui-resources/config-templates/
+          cp -rv `for f in ./interlok-templates/*;do echo "$f" | grep -vE "README.md|.whitesource|.git";done;` ./base-filesystem/ui-resources/config-templates/
+      - name: Zip interlok-base-filesystem-with-templates
+        run: |
+          cd ./base-filesystem && zip -r interlok-base-filesystem-with-templates.zip . -x *.zip
+      - name: Create Release
+        run: |
+          cd ./base-filesystem && gh release create ${{ env.RELEASE_VERSION }} './interlok-base-filesystem.zip' './interlok-base-filesystem-with-templates.zip'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up maven settings.xml
+        uses: s4u/maven-settings-action@v2.6.0
+        with:
+          servers: '[{"id": "releases", "username": "deployment", "password": "${{ secrets.NEXUS_REPO_PASSWORD }}"}]'
+      - name: Publish to nexus
+        run: |
+          cd ./base-filesystem
+          mvn deploy:deploy-file -DgroupId=com.adaptris -DartifactId=interlok-base-filesystem -Dversion=${{ env.RELEASE_VERSION }} -DgeneratePom=true -Dpackaging=zip -DrepositoryId=releases -Durl=https://nexus.adaptris.net/nexus/content/repositories/releases -Dfile=./interlok-base-filesystem.zip -Dclassifiers=with-templates -Dfiles=./interlok-base-filesystem-with-templates.zip -Dtypes=zip
+   
