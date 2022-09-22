@@ -6,12 +6,12 @@
 
 The base directory structure used in an Interlok installation:
  - bin
-  - README.TXT: Text file explaining how to use the start scripts
-  - start-interlok: Bash script to start Interlok on Linux/Mac
-  - start-interlok.bat: Bat script to start Interlok on Windows
+   - README.TXT: Text file explaining how to use the start scripts
+   - start-interlok: Bash script to start Interlok on Linux/Mac
+   - start-interlok.bat: Bat script to start Interlok on Windows
  - config
-  - adapter.xml: Adapter XML configuration
-  - bootstrap.properties: Adapter bootstrap properties
-  - log4j2.xml: Log4j XML configuration
+   - adapter.xml: Adapter XML configuration
+   - bootstrap.properties: Adapter bootstrap properties
+   - log4j2.xml: Log4j XML configuration
  - webapp
-  - ROOT.war: The base webapp started when Jetty management component is used.
+   - ROOT.war: The base webapp started when Jetty management component is used.
