@@ -72,7 +72,7 @@ set CLASSPATH=%APP_HOME%\lib\interlok-boot.jar
 @rem Go to app home dir
 cd %APP_HOME%
 @rem Execute Interlok
-"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %INTERLOK_OPTS%  -classpath "%CLASSPATH%" com.adaptris.interlok.boot.InterlokLauncher %*
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %INTERLOK_OPTS%  -classpath "%CLASSPATH%" -jar ../lib/interlok-boot.jar %*
 
 :end
 @rem End local scope for the variables with windows NT shell
