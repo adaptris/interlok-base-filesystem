@@ -180,7 +180,7 @@ save () {
 APP_ARGS=`save "$@"`
 
 # Collect all arguments for the java command, following the shell quoting and substitution rules
-eval set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $INTERLOK_OPTS -classpath "\"$CLASSPATH\"" com.adaptris.interlok.boot.InterlokLauncher "$APP_ARGS"
+eval set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $INTERLOK_OPTS -jar $APP_HOME/lib/interlok-boot.jar "$APP_ARGS"
 
 # Go to app home dir
 cd "$APP_HOME"
